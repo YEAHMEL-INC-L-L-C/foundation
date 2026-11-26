@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ChangeEvent, DragEvent, MouseEvent } from 'react';
 import {
-  AudioLines,
   CircleCheck,
   CircleX,
   Download,
@@ -23,6 +22,7 @@ import { analyzeTrack } from './engine/analysisClient.ts';
 import type { AnalysisSource } from './engine/analysisClient.ts';
 import type { VisualReport } from './engine/visualizerMath.ts';
 import Visualizer from './visualizer/Visualizer.tsx';
+import GlassLogo from './visualizer/GlassLogo.tsx';
 
 const SECTION_COLORS = ['#e8a84c', '#c7643a', '#8f9a5b', '#5e8ca8'];
 const TENSION_COLOR = '#e2725b';
@@ -265,7 +265,7 @@ export default function App() {
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
       <header className="mb-8 flex items-center gap-3">
-        <AudioLines className="h-8 w-8 text-[#e8a84c]" />
+        <GlassLogo size={56} report={visual} audioRef={audioRef} />
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Seeing Sounds</h1>
           <p className="text-sm text-[#9c8f78]">See exactly what you hear.</p>

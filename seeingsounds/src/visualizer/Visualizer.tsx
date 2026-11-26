@@ -52,12 +52,12 @@ export default function Visualizer({ report, audioRef, file, fileName, sampleRat
         canvas.width = w;
         canvas.height = h;
       }
-      drawVisual(ctx, w, h, report, audioRef.current?.currentTime ?? 0, fileName);
+      drawVisual(ctx, w, h, report, audioRef.current?.currentTime ?? 0, fileName, mark);
       raf = requestAnimationFrame(draw);
     };
     raf = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(raf);
-  }, [report, audioRef, fileName]);
+  }, [report, audioRef, fileName, mark]);
 
   // A new track invalidates any finished or running export.
   useEffect(() => {

@@ -146,7 +146,7 @@ export async function renderOffline(opts: OfflineRenderOptions): Promise<Blob> {
     for (let i = 0; i < total; i++) {
       if (opts.signal.aborted) throw abort();
       const t = i / fps;
-      if (i < songFrames) drawVisual(ctx, w, h, opts.report, t, opts.fileName);
+      if (i < songFrames) drawVisual(ctx, w, h, opts.report, t, opts.fileName, opts.mark);
       else drawOutro(ctx, w, h, (i - songFrames) / (total - songFrames - 1 || 1), opts.mark);
       await videoSource.add(t, dt);
       if (i % 15 === 0) {

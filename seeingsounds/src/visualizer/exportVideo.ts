@@ -149,7 +149,7 @@ async function recordRealtime(opts: ExportOptions): Promise<File> {
     source.buffer = buffer;
     source.connect(dest);
 
-    drawVisual(ctx, w, h, opts.report, 0, opts.fileName);
+    drawVisual(ctx, w, h, opts.report, 0, opts.fileName, opts.mark);
     const stream = canvas.captureStream(fps);
     for (const track of dest.stream.getAudioTracks()) stream.addTrack(track);
 
@@ -178,7 +178,7 @@ async function recordRealtime(opts: ExportOptions): Promise<File> {
       const tick = () => {
         const t = audioCtx.currentTime - t0;
         if (t < duration) {
-          drawVisual(ctx, w, h, opts.report, Math.max(0, t), opts.fileName);
+          drawVisual(ctx, w, h, opts.report, Math.max(0, t), opts.fileName, opts.mark);
         } else {
           drawOutro(ctx, w, h, Math.min(1, (t - duration) / OUTRO_SECONDS), opts.mark);
         }
