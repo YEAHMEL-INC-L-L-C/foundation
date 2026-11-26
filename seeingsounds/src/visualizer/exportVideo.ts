@@ -7,6 +7,8 @@
 // MediaRecorder, which can drop frames on a slow computer.
 import fixWebmDuration from 'fix-webm-duration';
 import type { VisualReport } from '../engine/visualizerMath.ts';
+import { ensureFont, fontChoice } from '../design/settings.ts';
+import type { DesignSettings } from '../design/settings.ts';
 import { decodeAt, EXTENSION, pickOfflinePlan, renderOffline } from './offlineExport.ts';
 import { drawOutro, drawVisual } from './render.ts';
 
@@ -58,6 +60,7 @@ export interface ExportOptions {
   aspect: Aspect;
   quality: Quality;
   mark: HTMLImageElement | null;
+  design: DesignSettings;
   onProgress: (fraction: number) => void;
   signal: AbortSignal;
 }
@@ -89,6 +92,7 @@ export async function exportVideo(opts: ExportOptions): Promise<ExportResult> {
   const fps = FPS[opts.quality];
   const bitrate = VIDEO_BITRATE[opts.quality];
   if (opts.mark && !opts.mark.complete) await opts.mark.decode().catch(() => {});
+  await ensureFont(fontChoice(opts.design.font));
 
   const original = await decodeAt(opts.file, opts.sampleRate);
   if (opts.signal.aborted) throw new DOMException('Export cancelled.', 'AbortError');
@@ -106,6 +110,7 @@ export async function exportVideo(opts: ExportOptions): Promise<ExportResult> {
       videoBitrate: bitrate,
       outroSeconds: OUTRO_SECONDS,
       mark: opts.mark,
+      design: opts.design,
       onProgress: opts.onProgress,
       signal: opts.signal,
     });
@@ -149,7 +154,7 @@ async function recordRealtime(opts: ExportOptions): Promise<File> {
     source.buffer = buffer;
     source.connect(dest);
 
-    drawVisual(ctx, w, h, opts.report, 0, opts.fileName, opts.mark);
+    drawVisual(ctx, w, h, opts.report, 0, { fileName: opts.fileName, mark: opts.mark, design: opts.design });
     const stream = canvas.captureStream(fps);
     for (const track of dest.stream.getAudioTracks()) stream.addTrack(track);
 
@@ -178,9 +183,9 @@ async function recordRealtime(opts: ExportOptions): Promise<File> {
       const tick = () => {
         const t = audioCtx.currentTime - t0;
         if (t < duration) {
-          drawVisual(ctx, w, h, opts.report, Math.max(0, t), opts.fileName, opts.mark);
+          drawVisual(ctx, w, h, opts.report, Math.max(0, t), { fileName: opts.fileName, mark: opts.mark, design: opts.design });
         } else {
-          drawOutro(ctx, w, h, Math.min(1, (t - duration) / OUTRO_SECONDS), opts.mark);
+          drawOutro(ctx, w, h, Math.min(1, (t - duration) / OUTRO_SECONDS), opts.mark, opts.design);
         }
         opts.onProgress(Math.max(0, Math.min(1, t / total)));
         if (t >= total) {

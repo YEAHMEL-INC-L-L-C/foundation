@@ -19,6 +19,7 @@ import {
 } from 'mediabunny';
 import type { AudioCodec, VideoCodec } from 'mediabunny';
 import type { VisualReport } from '../engine/visualizerMath.ts';
+import type { DesignSettings } from '../design/settings.ts';
 import { drawOutro, drawVisual } from './render.ts';
 
 export interface OfflinePlan {
@@ -87,6 +88,7 @@ export interface OfflineRenderOptions {
   videoBitrate: number;
   outroSeconds: number;
   mark: HTMLImageElement | null;
+  design: DesignSettings;
   onProgress: (fraction: number) => void;
   signal: AbortSignal;
 }
@@ -146,8 +148,8 @@ export async function renderOffline(opts: OfflineRenderOptions): Promise<Blob> {
     for (let i = 0; i < total; i++) {
       if (opts.signal.aborted) throw abort();
       const t = i / fps;
-      if (i < songFrames) drawVisual(ctx, w, h, opts.report, t, opts.fileName, opts.mark);
-      else drawOutro(ctx, w, h, (i - songFrames) / (total - songFrames - 1 || 1), opts.mark);
+      if (i < songFrames) drawVisual(ctx, w, h, opts.report, t, { fileName: opts.fileName, mark: opts.mark, design: opts.design });
+      else drawOutro(ctx, w, h, (i - songFrames) / (total - songFrames - 1 || 1), opts.mark, opts.design);
       await videoSource.add(t, dt);
       if (i % 15 === 0) {
         opts.onProgress(i / total);
