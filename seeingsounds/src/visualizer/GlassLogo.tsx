@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import type { RefObject } from 'react';
 import type { VisualReport } from '../engine/visualizerMath.ts';
+import type { DesignSettings } from '../design/settings.ts';
 import markUrl from './ss-mark.png';
 import { drawGlassMark } from './glassLogo.ts';
 import { frameAt } from './render.ts';
@@ -11,10 +12,11 @@ interface Props {
   /** When given and the audio is playing, the glass takes its light from the music. */
   report?: VisualReport | null;
   audioRef?: RefObject<HTMLAudioElement | null>;
+  design?: DesignSettings;
 }
 
 /** The SS mark as animated glass, for the app header. */
-export default function GlassLogo({ size, report, audioRef }: Props) {
+export default function GlassLogo({ size, report, audioRef, design }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mark = useMemo(() => {
     const img = new Image();
@@ -41,7 +43,7 @@ export default function GlassLogo({ size, report, audioRef }: Props) {
       const audio = audioRef?.current;
       const playing = !!(report && audio && !audio.paused);
       const t = reduceMotion ? 1.5 : performance.now() / 1000;
-      const state = playing ? frameAt(report!, audio!.currentTime) : null;
+      const state = playing ? frameAt(report!, audio!.currentTime, design) : null;
       drawGlassMark(ctx, mark, w / 2, (size * dpr) / 2, size * dpr * 0.78, t, {
         tint: state?.color ?? [240, 228, 205],
         energy: state ? state.glow : 0.2,
@@ -52,7 +54,7 @@ export default function GlassLogo({ size, report, audioRef }: Props) {
     if (mark.complete) draw();
     else mark.onload = draw;
     return () => cancelAnimationFrame(raf);
-  }, [mark, size, height, report, audioRef]);
+  }, [mark, size, height, report, audioRef, design]);
 
   return <canvas ref={canvasRef} style={{ width: size, height }} className="-mb-3 shrink-0" aria-hidden="true" />;
 }

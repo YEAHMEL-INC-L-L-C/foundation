@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 import { Download, Film, LoaderCircle, Share2, X } from 'lucide-react';
 import type { VisualReport } from '../engine/visualizerMath.ts';
+import { ensureFont, fontChoice } from '../design/settings.ts';
+import type { DesignSettings } from '../design/settings.ts';
 import markUrl from './ss-mark.png';
 import { drawVisual } from './render.ts';
 import { canExport, exportVideo, OUTRO_SECONDS, shareOrDownload } from './exportVideo.ts';
@@ -13,6 +15,7 @@ interface Props {
   file: File;
   fileName: string;
   sampleRate: number;
+  design: DesignSettings;
 }
 
 const selectClass =
@@ -24,7 +27,7 @@ function loadMark(): HTMLImageElement {
   return img;
 }
 
-export default function Visualizer({ report, audioRef, file, fileName, sampleRate }: Props) {
+export default function Visualizer({ report, audioRef, file, fileName, sampleRate, design }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mark = useMemo(loadMark, []);
   const [aspect, setAspect] = useState<Aspect>('landscape');
@@ -52,12 +55,16 @@ export default function Visualizer({ report, audioRef, file, fileName, sampleRat
         canvas.width = w;
         canvas.height = h;
       }
-      drawVisual(ctx, w, h, report, audioRef.current?.currentTime ?? 0, fileName, mark);
+      drawVisual(ctx, w, h, report, audioRef.current?.currentTime ?? 0, { fileName, mark, design });
       raf = requestAnimationFrame(draw);
     };
     raf = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(raf);
-  }, [report, audioRef, fileName, mark]);
+  }, [report, audioRef, fileName, mark, design]);
+
+  useEffect(() => {
+    void ensureFont(fontChoice(design.font));
+  }, [design.font]);
 
   // A new track invalidates any finished or running export.
   useEffect(() => {
@@ -79,6 +86,7 @@ export default function Visualizer({ report, audioRef, file, fileName, sampleRat
         file,
         fileName,
         sampleRate,
+        design,
         report,
         aspect,
         quality,
@@ -108,7 +116,7 @@ export default function Visualizer({ report, audioRef, file, fileName, sampleRat
 
   return (
     <section>
-      <h2 className="mb-2 font-semibold">Visualizer</h2>
+      <h2 className="font-display-wide mb-2 text-xl">Visualizer</h2>
       <canvas
         ref={canvasRef}
         className="aspect-video w-full rounded-xl border border-[#2a261f] bg-[#0e0d0b]"

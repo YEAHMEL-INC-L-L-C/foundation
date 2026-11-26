@@ -23,6 +23,9 @@ import type { AnalysisSource } from './engine/analysisClient.ts';
 import type { VisualReport } from './engine/visualizerMath.ts';
 import Visualizer from './visualizer/Visualizer.tsx';
 import GlassLogo from './visualizer/GlassLogo.tsx';
+import DesignPanel from './design/DesignPanel.tsx';
+import { loadDesign, saveDesign } from './design/settings.ts';
+import type { DesignSettings } from './design/settings.ts';
 
 const SECTION_COLORS = ['#e8a84c', '#c7643a', '#8f9a5b', '#5e8ca8'];
 const TENSION_COLOR = '#e2725b';
@@ -43,8 +46,8 @@ function formatTime(sec: number): string {
 function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div className="rounded-xl border border-[#2a261f] bg-[#16140f] p-4">
-      <div className="text-xs uppercase tracking-widest text-[#9c8f78]">{label}</div>
-      <div className="mt-1 text-2xl font-semibold">{value}</div>
+      <div className="text-sm text-[#b8ab92]">{label}</div>
+      <div className="font-display-wide mt-1 text-2xl tabular-nums">{value}</div>
       {sub && <div className="mt-1 text-xs text-[#9c8f78]">{sub}</div>}
     </div>
   );
@@ -174,6 +177,9 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
+  const [design, setDesign] = useState<DesignSettings>(loadDesign);
+
+  useEffect(() => saveDesign(design), [design]);
   const audioRef = useRef<HTMLAudioElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -264,11 +270,11 @@ export default function App() {
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
-      <header className="mb-8 flex items-center gap-3">
-        <GlassLogo size={56} report={visual} audioRef={audioRef} />
+      <header className="mb-10 flex items-center gap-4">
+        <GlassLogo size={64} report={visual} audioRef={audioRef} design={design} />
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Seeing Sounds</h1>
-          <p className="text-sm text-[#9c8f78]">See exactly what you hear.</p>
+          <h1 className="font-wordmark text-4xl leading-none text-[#f0e4cd] sm:text-5xl">Seeing Sounds</h1>
+          <p className="mt-2 text-sm text-[#b8ab92]">See exactly what you hear.</p>
         </div>
       </header>
 
@@ -321,7 +327,7 @@ export default function App() {
         <main className="mt-8 space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <div className="text-lg font-semibold">{analysis.track.file}</div>
+              <div className="font-display-wide text-xl">{analysis.track.file}</div>
               <div className="text-sm text-[#9c8f78]">
                 {analysis.track.sr.toLocaleString()} Hz · {formatTime(analysis.track.duration_sec)} ({analysis.track.duration_sec}s)
                 {source && <> · Analyzed {source === 'server' ? 'on the Seeing Sounds server' : 'on this device'}</>}
@@ -345,7 +351,12 @@ export default function App() {
               file={audioFile}
               fileName={analysis.track.file}
               sampleRate={analysis.track.sr}
+              design={design}
             />
+          )}
+
+          {visual && (
+            <DesignPanel design={design} onChange={setDesign} defaultTitle={analysis.track.file.replace(/\.[^.]+$/, '')} />
           )}
 
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -357,9 +368,9 @@ export default function App() {
               sub={hasPitch ? 'Strongest note in the chroma' : 'No pitched content detected'}
             />
             <div className="rounded-xl border border-[#2a261f] bg-[#16140f] p-4">
-              <div className="text-xs uppercase tracking-widest text-[#9c8f78]">Integrity</div>
+              <div className="text-sm text-[#b8ab92]">Integrity</div>
               <div
-                className={`mt-1 flex items-center gap-2 text-2xl font-semibold ${
+                className={`font-display-wide mt-1 flex items-center gap-2 text-2xl ${
                   analysis.integrity.passed ? 'text-[#8fc27a]' : 'text-[#e2725b]'
                 }`}
               >
@@ -372,7 +383,7 @@ export default function App() {
 
           <section>
             <div className="mb-2 flex items-center justify-between">
-              <h2 className="font-semibold">Timeline</h2>
+              <h2 className="font-display-wide text-xl">Timeline</h2>
               <div className="flex gap-4 text-xs text-[#9c8f78]">
                 <span><span className="text-[#5e8ca8]">━</span> Brightness</span>
                 <span><span className="text-[#e8a84c]">━</span> Energy</span>
@@ -417,13 +428,13 @@ export default function App() {
           )}
 
           <section>
-            <h2 className="mb-2 font-semibold">Pitch classes (chroma)</h2>
+            <h2 className="mb-2 font-display-wide text-xl">Pitch classes (chroma)</h2>
             <ChromaChart chroma={vm.chroma} dominant={hasPitch ? vm.dominant_pitch : ''} />
           </section>
 
           {detailed && detailed.phrases.length > 0 && (
             <section>
-              <h2 className="font-semibold">Phrases</h2>
+              <h2 className="font-display-wide text-xl">Phrases</h2>
               <p className="mb-2 text-xs text-[#9c8f78]">
                 {detailed.phrases.length} phrases of up to 4 bars, cut on downbeats. Tension combines energy, brightness, and how
                 busy the onsets are.
@@ -459,7 +470,7 @@ export default function App() {
           )}
 
           <section>
-            <h2 className="mb-2 font-semibold">Sections</h2>
+            <h2 className="mb-2 font-display-wide text-xl">Sections</h2>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
               {vm.sections.map((s, i) => (
                 <button

@@ -3,11 +3,22 @@
 // exactly like what plays on screen. Everything here is deterministic: the
 // same report and time always draw the same picture.
 import type { VisualReport } from '../engine/visualizerMath.ts';
-import { PALETTE } from '../engine/visualizerMath.ts';
+import { canvasFont, DEFAULT_DESIGN, fontChoice, paletteRgb } from '../design/settings.ts';
+import type { DesignSettings } from '../design/settings.ts';
 import { drawGlassMark } from './glassLogo.ts';
 
 export const BACKGROUND = '#0e0d0b';
 const CREAM = '#f0e4cd';
+const UI_FONT = '"Archivo Variable", ui-sans-serif, system-ui, sans-serif';
+
+export interface DrawOptions {
+  /** Song title; the file name is used when the design leaves it empty. */
+  fileName?: string;
+  mark?: HTMLImageElement | null;
+  design?: DesignSettings;
+}
+
+type RGB = [number, number, number];
 const SPARKLES = 64;
 const DRIPS = 7;
 
@@ -20,13 +31,19 @@ export interface FrameState {
   glow: number;
   bass: number;
   hit: number;
-  color: [number, number, number];
+  vox: number;
+  high: number;
+  color: RGB;
 }
 
 const lerp = (a: number, b: number, f: number) => a + (b - a) * f;
 
-/** Frame values at time t (seconds), interpolated between the report's frames. */
-export function frameAt(report: VisualReport, t: number): FrameState {
+/**
+ * Frame values at time t (seconds), interpolated between the report's frames.
+ * With a design, the colour is re-blended from the band signals using the
+ * design's palette (same weights as the engines), so custom colours apply.
+ */
+export function frameAt(report: VisualReport, t: number, design?: DesignSettings): FrameState {
   const { frames, signals, nf, fps } = report;
   const pos = Math.max(0, Math.min(nf - 1, t * fps));
   const i = Math.floor(pos);
@@ -35,6 +52,23 @@ export function frameAt(report: VisualReport, t: number): FrameState {
   const mix = (arr: number[]) => lerp(arr[i] ?? 0, arr[j] ?? 0, f);
   const ci = frames.color[i] ?? [0, 0, 0];
   const cj = frames.color[j] ?? ci;
+  const bass = mix(signals.bass);
+  const hit = mix(signals.hit);
+  const vox = mix(signals.vox);
+  const high = mix(signals.high);
+  let color: RGB = [lerp(ci[0], cj[0], f), lerp(ci[1], cj[1], f), lerp(ci[2], cj[2], f)];
+  if (design) {
+    const p = paletteRgb(design);
+    const weights: [RGB, number][] = [
+      [p.green, 0.15],
+      [p.red, bass],
+      [p.yellow, hit],
+      [p.pink, vox],
+      [p.teal, high],
+    ];
+    const total = weights.reduce((acc, [, wgt]) => acc + wgt, 0);
+    color = [0, 1, 2].map((k) => weights.reduce((acc, [c, wgt]) => acc + c[k] * wgt, 0) / total) as RGB;
+  }
   return {
     x: mix(frames.orb_x),
     y: mix(frames.orb_y),
@@ -42,13 +76,15 @@ export function frameAt(report: VisualReport, t: number): FrameState {
     ring: mix(frames.ring),
     sparkle: mix(frames.sparkle),
     glow: mix(frames.glow),
-    bass: mix(signals.bass),
-    hit: mix(signals.hit),
-    color: [lerp(ci[0], cj[0], f), lerp(ci[1], cj[1], f), lerp(ci[2], cj[2], f)],
+    bass,
+    hit,
+    vox,
+    high,
+    color,
   };
 }
 
-const rgba = ([r, g, b]: [number, number, number], a: number) =>
+const rgba = ([r, g, b]: RGB, a: number) =>
   `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${a})`;
 
 /** Draw the visualizer at time t. Canvas size is w x h in pixels. */
@@ -58,10 +94,12 @@ export function drawVisual(
   h: number,
   report: VisualReport,
   t: number,
-  title?: string,
-  mark: HTMLImageElement | null = null
+  opts: DrawOptions = {}
 ) {
-  const s = frameAt(report, t);
+  const design = opts.design ?? DEFAULT_DESIGN;
+  const mark = opts.mark ?? null;
+  const palette = paletteRgb(design);
+  const s = frameAt(report, t, design);
   const m = Math.min(w, h);
   const cx = s.x * w;
   const cy = s.y * h;
@@ -92,7 +130,7 @@ export function drawVisual(
 
   // Vocal ring: a wobbling outline that swells with the vocal band.
   const ringR = R * 1.35;
-  ctx.strokeStyle = rgba([252, 4, 113], 0.35 + 0.6 * s.ring);
+  ctx.strokeStyle = rgba(palette.pink, 0.35 + 0.6 * s.ring);
   ctx.lineWidth = m * (0.003 + 0.01 * s.ring);
   ctx.beginPath();
   for (let k = 0; k <= 120; k++) {
@@ -141,9 +179,9 @@ export function drawVisual(
     ctx.stroke();
   }
 
-  // Labels.
+  // Labels: the brand mark bottom right, the artist and song bottom left.
   const fs = Math.max(11, m * 0.028);
-  ctx.font = `600 ${fs}px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif`;
+  ctx.font = `600 ${fs}px ${UI_FONT}`;
   ctx.textBaseline = 'bottom';
   ctx.fillStyle = 'rgba(240, 228, 205, 0.55)';
   ctx.textAlign = 'right';
@@ -155,43 +193,70 @@ export function drawVisual(
     tint: s.color,
     energy: s.glow,
   });
+
+  const title = (design.title.trim() || (opts.fileName ?? '').replace(/\.[^.]+$/, '')).trim();
+  const font = fontChoice(design.font);
+  ctx.textAlign = 'left';
   if (title) {
-    ctx.textAlign = 'left';
-    ctx.fillStyle = 'rgba(240, 228, 205, 0.8)';
-    ctx.fillText(title.replace(/\.[^.]+$/, ''), fs, h - fs * 0.8, w * 0.6);
+    ctx.font = canvasFont(font, fs * 1.9);
+    ctx.fillStyle = CREAM;
+    ctx.fillText(title, fs, h - fs * 0.8, w * 0.6);
+  }
+  if (design.artist.trim()) {
+    ctx.font = `600 ${fs}px ${UI_FONT}`;
+    ctx.fillStyle = rgba(palette.yellow, 0.9);
+    ctx.fillText(design.artist.trim(), fs, h - fs * 0.8 - (title ? fs * 2.3 : 0), w * 0.6);
   }
 }
 
 /** Outro card. p runs 0..1 over the card's duration. */
-export function drawOutro(ctx: CanvasRenderingContext2D, w: number, h: number, p: number, mark: HTMLImageElement | null) {
+export function drawOutro(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number,
+  p: number,
+  mark: HTMLImageElement | null,
+  design: DesignSettings = DEFAULT_DESIGN
+) {
   const m = Math.min(w, h);
   const fade = Math.min(1, p / 0.25);
+  const palette = paletteRgb(design);
+  const font = fontChoice(design.font);
   ctx.fillStyle = BACKGROUND;
   ctx.fillRect(0, 0, w, h);
   ctx.globalAlpha = fade;
   const markSize = m * 0.34;
   const top = h / 2 - markSize * 0.78;
-  // Glass mark with a mirror reflection; its light drifts through the logo colours.
-  const cols = [PALETTE.red, PALETTE.pink, PALETTE.teal, PALETTE.yellow, PALETTE.green];
+  // Glass mark with a mirror reflection; its light drifts through the palette.
+  const cols = [palette.red, palette.pink, palette.teal, palette.yellow, palette.green];
   const f = (p * (cols.length - 1)) % (cols.length - 1);
   const a = cols[Math.floor(f)];
   const b = cols[Math.min(cols.length - 1, Math.floor(f) + 1)];
   const k = f - Math.floor(f);
-  const tint: [number, number, number] = [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
+  const tint: RGB = [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
   // The sweep starts mid-mark so a short card still shows one full reflection.
   drawGlassMark(ctx, mark, w / 2, top + markSize / 2, markSize, 2.0 + p * 4.5, { tint, energy: 0.55, reflection: true });
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
-  ctx.fillStyle = 'rgba(240, 228, 205, 0.7)';
   const small = m * 0.034;
-  ctx.font = `500 ${small}px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif`;
-  ctx.fillText('Powered by', w / 2, top + markSize * 1.33);
-  ctx.fillStyle = CREAM;
-  const big = m * 0.07;
-  ctx.font = `800 ${big}px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif`;
-  ctx.fillText('Seeing Sounds', w / 2, top + markSize * 1.33 + small * 1.4);
-  ctx.fillStyle = '#e8a84c';
-  ctx.font = `700 ${small * 1.2}px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif`;
-  ctx.fillText('YeahMel', w / 2, top + markSize * 1.33 + small * 1.4 + big * 1.25);
+  const big = m * 0.075;
+  let y = top + markSize * 1.33;
+  if (design.outroTop.trim()) {
+    ctx.fillStyle = 'rgba(240, 228, 205, 0.7)';
+    ctx.font = `500 ${small}px ${UI_FONT}`;
+    ctx.fillText(design.outroTop.trim(), w / 2, y, w * 0.9);
+    y += small * 1.4;
+  }
+  if (design.outroBrand.trim()) {
+    ctx.fillStyle = CREAM;
+    ctx.font = canvasFont(font, big);
+    ctx.fillText(design.outroBrand.trim(), w / 2, y, w * 0.9);
+    y += big * 1.4;
+  }
+  if (design.artist.trim()) {
+    ctx.fillStyle = rgba(palette.yellow, 1);
+    ctx.font = `700 ${small * 1.2}px ${UI_FONT}`;
+    ctx.fillText(design.artist.trim(), w / 2, y, w * 0.9);
+  }
   ctx.globalAlpha = 1;
 }

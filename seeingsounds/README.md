@@ -53,6 +53,8 @@ A browser app for the math engine. Drop in a track, or use the built-in 92 BPM s
 
 It also shows a 60 fps visualizer drawn from the track (a pulsing orb, vocal ring, drips and sparkles in the logo's colors) and exports it as a video, up to 1080p at 60 fps with stereo audio, ending on a "Powered by Seeing Sounds / YeahMel" card. Videos can be shared from phones or downloaded.
 
+The Design panel lets you change what the visuals and videos say and look like: the song title, artist name and outro text, the title font (five choices, from dripping paint to marker), and the five colours the visuals are built from, each following part of the sound. Changes apply live and are saved on your device.
+
 Uploads can be mono or stereo WAV at 16, 24 or 32-bit, FLAC, MP3 and more, of any length. On the web, the Python server analyzes them; in the desktop and iOS app, or offline, the same engines run on the device.
 
 ```
@@ -113,4 +115,6 @@ Ideas and feedback are welcome. Open an issue to share a suggestion or report a 
 
 ## License
 
-Copyright © 2026 YEAHMEL INC LLC. All rights reserved. See [LICENSE](LICENSE). The ZEAL artwork and music are not part of this repository.
+Copyright 2026 YEAHMEL INC LLC. The code is licensed under the [Apache License 2.0](LICENSE).
+
+The Seeing Sounds and YeahMel names and logos are trademarks of YEAHMEL INC LLC and are not covered by the license; see [NOTICE](NOTICE) for which files that includes. The ZEAL artwork and music are not part of this repository.
