@@ -1,0 +1,20 @@
+Seeing Sounds
+Copyright 2026 YEAHMEL INC LLC
+
+The source code and documentation in this directory are licensed under the
+Apache License, Version 2.0 (see LICENSE).
+
+Brand assets are not licensed under the Apache License. The names "Seeing
+Sounds", "YeahMel" and "YEAHMEL INC LLC" are trademarks of YEAHMEL INC LLC,
+and the logo artwork is copyright YEAHMEL INC LLC, all rights reserved:
+
+  app-icon.png
+  src/visualizer/ss-mark.png
+  src-tauri/icons/
+
+To use the code in your own product, replace these files with your own
+artwork. ZEAL artwork and music are not part of this repository.
+
+Third-party libraries remain under their own licenses. Bundled fonts:
+Rubik Wet Paint, Archivo, Bungee and DM Serif Display (SIL Open Font
+License 1.1); Permanent Marker (Apache License 2.0).

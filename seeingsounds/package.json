@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Music-math and visual design studio for independent artists.",
   "author": "YEAHMEL INC LLC",
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "private": true,
   "type": "module",
   "scripts": {

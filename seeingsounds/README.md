@@ -115,4 +115,6 @@ Ideas and feedback are welcome. Open an issue to share a suggestion or report a 
 
 ## License
 
-Copyright © 2026 YEAHMEL INC LLC. All rights reserved. See [LICENSE](LICENSE). The ZEAL artwork and music are not part of this repository.
+Copyright 2026 YEAHMEL INC LLC. The code is licensed under the [Apache License 2.0](LICENSE).
+
+The Seeing Sounds and YeahMel names and logos are trademarks of YEAHMEL INC LLC and are not covered by the license; see [NOTICE](NOTICE) for which files that includes. The ZEAL artwork and music are not part of this repository.
