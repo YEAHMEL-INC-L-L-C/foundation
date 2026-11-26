@@ -1,3 +1,4 @@
+import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
@@ -22,5 +23,13 @@ export default defineConfig({
   build: {
     // WKWebView on iOS 15+ and WebView2/WebKitGTK all support ES2021.
     target: 'es2021',
+    rollupOptions: {
+      // The app, plus the privacy policy and terms pages.
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        privacy: resolve(__dirname, 'privacy/index.html'),
+        terms: resolve(__dirname, 'terms/index.html'),
+      },
+    },
   },
 });
