@@ -103,6 +103,8 @@ On Windows, activate the environment with `.venv\Scripts\activate`.
 
 ## About the creator
 
+Seeing Sounds is owned and developed by **YEAHMEL INC LLC**.
+
 Built by **YeahMel** (Melvin Gregory King), an independent hip-hop artist and creative entrepreneur from the Cleveland, Ohio area. The goal is to give independent artists the same quality of tools and knowledge that larger industry players have. The community around the music is called The Zealots.
 
 ## Contributing
@@ -111,4 +113,4 @@ Ideas and feedback are welcome. Open an issue to share a suggestion or report a 
 
 ## License
 
-No license has been chosen yet, so all rights are reserved. The ZEAL artwork and music are not part of this repository.
+Copyright © 2026 YEAHMEL INC LLC. All rights reserved. See [LICENSE](LICENSE). The ZEAL artwork and music are not part of this repository.

@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Seeing Sounds",
   "version": "1.0.0",
-  "identifier": "app.seeingsounds.desktop",
+  "identifier": "com.yeahmel.seeingsounds",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:3000",
@@ -39,6 +39,8 @@
       "debugApplicationIdSuffix": ".debug"
     },
     "category": "Music",
-    "shortDescription": "See exactly what you hear."
+    "shortDescription": "See exactly what you hear.",
+    "publisher": "YEAHMEL INC LLC",
+    "copyright": "Copyright © 2026 YEAHMEL INC LLC. All rights reserved."
   }
 }

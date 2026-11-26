@@ -2,6 +2,9 @@
 name = "seeing-sounds"
 version = "1.0.0"
 description = "Seeing Sounds desktop and iOS app"
+authors = ["YEAHMEL INC LLC"]
+license-file = "../LICENSE"
+publish = false
 edition = "2024"
 rust-version = "1.90"
 

@@ -1,5 +1,5 @@
 # Seeing Sounds — Project Record
-**Founder:** Melvin Gregory King (YeahMel) | **Last Updated:** Nov 23, 2026
+**Owner:** YEAHMEL INC LLC | **Founder:** Melvin Gregory King (YeahMel) | **Last Updated:** Nov 23, 2026
 
 ## Product Vision
 An interactive, ethical music-to-visual analysis and design studio ("CapCut-style control tuned for musicians, driven by verified music math"). Helps independent artists inspect the mathematical and cognitive structure of their tracks and map sound to customizable visual elements (color, motion, typography) while keeping 100% of audio creation, editing, and visual judgment in human hands.

@@ -86,10 +86,10 @@ Then upload the archive from Xcode (Window > Organizer) or with Transporter.
 
 ## Before you publish
 
-- **Bundle identifier.** `identifier` in `src-tauri/tauri.conf.json` is set to
-  `app.seeingsounds.desktop`. Change it to a reverse domain you own (for example
-  `com.yourcompany.seeingsounds`) before the first App Store upload. It cannot
-  be changed after release.
+- **Bundle identifier.** `identifier` in `src-tauri/tauri.conf.json` is
+  `com.yeahmel.seeingsounds`, on YEAHMEL INC LLC's yeahmel.com domain. Register
+  the same identifier in your Apple Developer account. It cannot be changed
+  after the first App Store release.
 - **Icons.** The app icon is the drip "SS" from the Seeing Sounds logo. Its
   1024x1024 source is `app-icon.png` at the repository root, and
   `src-tauri/icons/` holds the sizes made from it. After `tauri ios init`, or
