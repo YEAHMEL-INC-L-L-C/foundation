@@ -1,0 +1,5 @@
+{
+  "name": "Seeing Sounds",
+  "description": "Deterministic audio math engine and ZEAL cover visualizer — see exactly what you hear.",
+  "requestFramePermissions": []
+}
