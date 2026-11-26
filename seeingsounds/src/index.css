@@ -36,3 +36,40 @@ pre, code, .font-mono {
   outline: 2px solid #e8a84c;
   outline-offset: 2px;
 }
+
+/* Privacy policy and terms pages. */
+.legal {
+  max-width: 68ch;
+  margin: 0 auto;
+  padding: 3rem 1.25rem 5rem;
+  line-height: 1.65;
+}
+.legal .home {
+  font-family: "Rubik Wet Paint", ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.75rem;
+  color: #f0e4cd;
+  text-decoration: none;
+}
+.legal h1 {
+  font-family: "Archivo Variable", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 800;
+  font-stretch: 125%;
+  font-variation-settings: "wdth" 125;
+  font-size: 2.25rem;
+  line-height: 1.1;
+  margin: 2rem 0 0.5rem;
+}
+.legal h2 {
+  font-weight: 800;
+  font-stretch: 125%;
+  font-variation-settings: "wdth" 125;
+  font-size: 1.2rem;
+  margin: 2.25rem 0 0.5rem;
+}
+.legal p, .legal li { color: #d9ccb3; }
+.legal p { margin: 0.85rem 0; }
+.legal .meta { color: #9c8f78; font-size: 0.9rem; }
+.legal ul { list-style: disc; padding-left: 1.25rem; margin: 0.5rem 0; }
+.legal li { margin: 0.35rem 0; }
+.legal a { color: #e8a84c; }
+.legal strong { color: #f0e4cd; }

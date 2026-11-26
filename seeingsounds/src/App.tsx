@@ -503,6 +503,19 @@ export default function App() {
           </section>
         </main>
       )}
+
+      <footer className="mt-16 flex flex-wrap gap-x-5 gap-y-2 border-t border-[#2a261f] pt-6 text-sm text-[#9c8f78]">
+        <span>© 2026 YEAHMEL INC LLC</span>
+        <a href="/privacy/" className="hover:text-[#f0e4cd]">
+          Privacy policy
+        </a>
+        <a href="/terms/" className="hover:text-[#f0e4cd]">
+          Terms of service
+        </a>
+        <a href="https://www.yeahmel.com" target="_blank" rel="noreferrer" className="hover:text-[#f0e4cd]">
+          yeahmel.com
+        </a>
+      </footer>
     </div>
   );
 }
