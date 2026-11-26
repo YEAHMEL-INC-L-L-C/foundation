@@ -1,0 +1,15 @@
+# Keep the build context small and free of local files.
+.git
+node_modules
+dist
+src-tauri
+visualizer
+ZEAL
+.venv
+__pycache__
+.pytest_cache
+*.wav
+*.mp3
+*.flac
+*.mp4
+.env
